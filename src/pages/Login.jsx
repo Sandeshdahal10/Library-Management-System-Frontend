@@ -1,9 +1,9 @@
 export default function Login() {
   return (
     <>
-      <div className="login-container flex flex-col items-center justify-center min-h-screen mb-6">
-        <div className="login-form bg-white p-4 sm:p-6 md:p-8 rounded shadow w-full max-w-md md:max-w-lg   border-primary xl:p-13">
-          <div className="text-center mb-2 flex items-center justify-center">
+      <div className="login-container flex flex-col items-center justify-center min-h-screen ">
+        <div className="login-form bg-white  sm:p-6 md:p-8 xl:p-10 rounded shadow w-full max-w-sm md:min-w-xl lg:min xl:min-w-xl xl:max-h-[400px] border-primary">
+          <div className="text-center mb-2 flex items-center justify-center"> 
             <h1 className="text-3xl font-bold text-blue-600">
               Book Nest Library
             </h1>
@@ -47,7 +47,7 @@ export default function Login() {
             <div className="flex items-center justify-center mb-7 mt-4 w-full">
               <button
                 type="submit"
-                className="w-full sm:w-[120px] btn-popout bg-secondary text-white font-semibold rounded-md px-4 py-2 hover:bg-accent focus:outline-none focus:ring-offset-2 transition duration-200 justify-center items-center shadow-md mt-5 "
+                className="w-full sm:w-[120px] btn-popout bg-secondary text-white font-semibold rounded-md px-4 py-2 hover:bg-accent focus:outline-none focus:ring-offset-2 transition duration-200 justify-center items-center shadow-md mb-5 "
               >
                 <span>Login</span>
               </button>
