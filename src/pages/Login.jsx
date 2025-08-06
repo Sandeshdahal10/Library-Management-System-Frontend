@@ -16,7 +16,7 @@ export default function Login() {
               <input type="password" id="password" name="password" placeholder="Enter your password"required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:border-blue-500 text-xl text-primary" />
             </div>
             <div className="flex items-center justify-center mb-7 mt-4 w-full">
-              <button type="submit" className="w-[90px] bg-secondary text-white font-semibold rounded-md px-4 py-2 hover:bg-accent focus:outline-none   focus:ring-offset-2 transition duration-200 justify-center  items-center shadow-md">
+              <button type="submit" className="w-[90px] btn-popout bg-secondary text-white font-semibold rounded-md px-4 py-2 hover:bg-accent focus:outline-none   focus:ring-offset-2 transition duration-200 justify-center  items-center shadow-md ">
                 <span>Login</span>
               </button>
             </div>

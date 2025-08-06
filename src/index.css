@@ -1,3 +1,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.btn-popout{
+  transition: transform 0.5s;
+  transform-style: preserve-3d;
+}
+
+.btn-popout:hover {
+  transform: perspective(400px) translateZ(20px);
+}
