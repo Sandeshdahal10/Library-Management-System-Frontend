@@ -1,0 +1,30 @@
+export default function Login() {
+  return(
+    <>
+    <div className="login-container flex flex-col items-center justify-center h-screen">
+      <div className="login-form bg-white p-8 rounded shadow w-[30%] h-[400px] border-primary">
+          <div className="text-center mb-2  flex items-center justify-center">
+            <h1 className="text-3xl font-bold text-blue-600">Book Nest Library</h1>
+          </div>
+          <form action="loginForm" className="flex flex-col gap-4 p-3 rounded h-[320px] items-center justify-center">
+            <div className="w-full flex flex-col gap-2">
+              <label htmlFor="email" className="block text-xl font-bold text-primary text-left py-1">Email</label>
+              <input type="email" id="email" name="email" required placeholder="abc@gmail.com"className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:border-blue-500 text-xl text-primary " />
+            </div>
+            <div className="w-full flex flex-col gap-2">
+              <label htmlFor="password" className="block text-xl font-bold text-primary text-left py-1">Password</label>
+              <input type="password" id="password" name="password" placeholder="Enter your password"required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:border-blue-500 text-xl text-primary" />
+            </div>
+            <div className="flex items-center justify-center mb-7 mt-4 w-full">
+              <button type="submit" className="w-[90px] bg-secondary text-white font-semibold rounded-md px-4 py-2 hover:bg-accent focus:outline-none   focus:ring-offset-2 transition duration-200 justify-center  items-center shadow-md">
+                <span>Login</span>
+              </button>
+            </div>
+          </form>
+      </div>
+    </div>
+    </>
+  )
+
+}
+
