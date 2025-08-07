@@ -1,4 +1,44 @@
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import {useAuth} from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import React from 'react';
+
 export default function Login() {
+  const [email, setEmail] = React.useState('');
+  const {login} = useAuth();
+  const navigate = useNavigate();
+  const [password, setPassword] = React.useState('');
+
+  async function handleLogin(e) {
+    e.preventDefault();
+  
+    try{
+      const response = await axios.post('/login', {
+        email: email,
+        password: password
+      });
+      console.log(response.data);
+      const token = response.data.token;
+      const user = response.data.user;
+      console.log(response.data.token);
+      console.log(response.data.user);
+      if(token && user) {
+        login(user,token);
+      }
+
+      if(token){
+        toast.success("Login successfull")
+        navigate('/librarian');
+        localStorage.setItem('token', token);
+      }else{
+        toast.error("Login failed, please try again");
+      }
+    }catch(error){
+      toast.error("Login failed, please try again");
+    }
+  }
+
   return (
     <>
       <div className="login-container flex flex-col items-center justify-center min-h-screen ">
@@ -8,7 +48,7 @@ export default function Login() {
               Book Nest Library
             </h1>
           </div>
-          <form
+          <form onSubmit={handleLogin}
             action="loginForm"
             className="flex flex-col gap-4 p-3 rounded h-auto items-center justify-center"
           >
