@@ -3,12 +3,14 @@ import Login from './pages/Login';
 import Dashboard from './pages/Librarian/Dashboard';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Landing from './pages/Landing';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/librarian" element={<Dashboard/>}/>
       </Routes>
       <ToastContainer
