@@ -7,7 +7,7 @@ export function Dashboard() {
     <>
       <Header />
       
-      {/* <Sidebar /> */}
+      <Sidebar />
     </>
   )
 }
