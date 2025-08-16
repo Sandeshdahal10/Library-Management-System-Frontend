@@ -1,6 +1,6 @@
 import { FaBookOpen, FaSearch, FaBell, FaUser } from "react-icons/fa";
 import LogoutButton from "../utils/Logout";
-export function Header() {
+export function Header({ onToggleSidebar }) {
   return (
     <header className="sticky top-0 z-50 bg-white shadow">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
@@ -8,8 +8,8 @@ export function Header() {
           <button
             type="button"
             aria-label="Toggle sidebar"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 md:hidden pointer-events-none"
-            disabled
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 md:hidden"
+            onClick={onToggleSidebar}
             title="Sidebar"
           >
             <span aria-hidden className="text-lg">
