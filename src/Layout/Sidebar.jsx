@@ -1,13 +1,8 @@
-import {
-  FaHome,
-  FaBook,
-  FaUsers,
-  FaChartBar,
-  FaCog,
-  FaQuestionCircle,
-} from "react-icons/fa";
+import { FaHome, FaBook, FaUsers, FaQuestionCircle } from "react-icons/fa";
+import { Link, useLocation } from "react-router-dom";
 
 export function Sidebar() {
+  const { pathname } = useLocation();
   return (
     <aside className="hidden md:flex sticky top-16 h-[calc(100vh-4rem)] w-64 flex-col border-r bg-white">
       {/* Navigation */}
@@ -22,13 +17,22 @@ export function Sidebar() {
         </div>
         <ul className="space-y-1">
           <li>
-            <button
-              type="button"
-              className="flex w-full items-center gap-3 rounded-lg bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700 pointer-events-none"
+            <Link
+              to="/librarian"
+              aria-current={pathname === "/librarian" ? "page" : undefined}
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
+                pathname === "/librarian"
+                  ? "bg-blue-50 text-blue-700"
+                  : "text-gray-700 hover:bg-gray-50"
+              }`}
             >
-              <FaHome className="text-blue-600" />
+              <FaHome
+                className={
+                  pathname === "/librarian" ? "text-blue-600" : "text-gray-400"
+                }
+              />
               <span>Dashboard</span>
-            </button>
+            </Link>
           </li>
         </ul>
 
@@ -38,71 +42,69 @@ export function Sidebar() {
         </div>
         <ul className="space-y-1">
           <li>
-            <button
-              type="button"
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 pointer-events-none"
+            <Link
+              to="/librarian/books"
+              aria-current={
+                pathname.startsWith("/librarian/books") ? "page" : undefined
+              }
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
+                pathname.startsWith("/librarian/books")
+                  ? "bg-blue-50 text-blue-700"
+                  : "text-gray-700 hover:bg-gray-50"
+              }`}
             >
-              <FaBook className="text-gray-400" />
+              <FaBook
+                className={
+                  pathname.startsWith("/librarian/books")
+                    ? "text-blue-600"
+                    : "text-gray-400"
+                }
+              />
               <span>Books</span>
-            </button>
+            </Link>
           </li>
           <li>
-            <button
-              type="button"
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 pointer-events-none"
+            <Link
+              to="/librarian/borrowers"
+              aria-current={
+                pathname.startsWith("/librarian/borrowers") ? "page" : undefined
+              }
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
+                pathname.startsWith("/librarian/borrowers")
+                  ? "bg-blue-50 text-blue-700"
+                  : "text-gray-700 hover:bg-gray-50"
+              }`}
             >
-              <FaUsers className="text-gray-400" />
+              <FaUsers
+                className={
+                  pathname.startsWith("/librarian/borrowers")
+                    ? "text-blue-600"
+                    : "text-gray-400"
+                }
+              />
               <span>Borrowers</span>
-            </button>
+            </Link>
           </li>
         </ul>
 
-        {/* Section: Insights */}
+        {/* Help */}
         <div className="mt-5 mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
-          Insights
+          Help
         </div>
-        <ul className="space-y-1">
-          <li>
-            <button
-              type="button"
-              disabled
-              aria-disabled="true"
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 pointer-events-none"
-            >
-              <FaChartBar className="text-gray-400" />
-              <span>Reports</span>
-            </button>
-          </li>
-        </ul>
-
-        {/* Section: System */}
-        <div className="mt-5 mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
-          System
+        <div className="px-2">
+          <div className="rounded-xl border border-blue-100 bg-blue-50 p-3 text-[12px] leading-relaxed text-blue-900 shadow-sm">
+            <div className="mb-2 flex items-center gap-2 font-semibold text-blue-800">
+              <FaQuestionCircle className="text-blue-600" />
+              <span>Getting started</span>
+            </div>
+            <ul className="list-disc space-y-1 pl-5">
+              <li>Use Library to manage Books and Borrowers.</li>
+              <li>Books: view, add, or update your catalog.</li>
+              <li>Borrowers: add members and manage details.</li>
+              <li>Use the top-right Logout to end your session.</li>
+            </ul>
+          </div>
         </div>
-        <ul className="space-y-1">
-          <li>
-            <button
-              type="button"
-              disabled
-              aria-disabled="true"
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 pointer-events-none"
-            >
-              <FaCog className="text-gray-400" />
-              <span>Settings</span>
-            </button>
-          </li>
-          <li>
-            <button
-              type="button"
-              disabled
-              aria-disabled="true"
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 pointer-events-none"
-            >
-              <FaQuestionCircle className="text-gray-400" />
-              <span>Help</span>
-            </button>
-          </li>
-        </ul>
       </nav>
 
       {/* Footer badge */}

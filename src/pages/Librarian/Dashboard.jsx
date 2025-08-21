@@ -1,6 +1,7 @@
 import Header from "../../Layout/Header";
 import Sidebar from "../../Layout/Sidebar";
 import { useAuth } from "../../context/AuthContext";
+import AddBorrowerButton from "../AddBorrowerButton";
 import {
   FaPlus,
   FaUsers,
@@ -10,6 +11,7 @@ import {
 } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useState } from "react";
+import AddBookButton from "../Button";
 
 export function Dashboard() {
   const { user } = useAuth();
@@ -68,18 +70,8 @@ export function Dashboard() {
                 </p>
               </div>
               <div className="flex gap-2">
-                <button
-                  onClick={click("Add book")}
-                  className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700"
-                >
-                  <FaPlus /> Add Book
-                </button>
-                <button
-                  onClick={click("Invite borrower")}
-                  className="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
-                >
-                  <FaUsers /> Invite Borrower
-                </button>
+                <AddBookButton />
+                <AddBorrowerButton />
               </div>
             </div>
           </section>
@@ -143,42 +135,20 @@ export function Dashboard() {
             </button>
           </section>
 
-          {/* Quick Links */}
+          {/* Announcements */}
           <section className="grid gap-3 sm:gap-4 lg:grid-cols-3">
-            <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-              <h2 className="mb-3 text-sm font-semibold text-gray-900">
-                Quick Links
-              </h2>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { label: "New Book", action: "Add book" },
-                  { label: "Borrower List", action: "Borrowers" },
-                  { label: "Reports", action: "Reports" },
-                  { label: "Settings", action: "Settings" },
-                ].map((item) => (
-                  <button
-                    key={item.label}
-                    onClick={click(item.action)}
-                    className="rounded-lg border border-gray-200 px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm lg:col-span-2">
+            <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm lg:col-span-3">
               <h2 className="mb-3 text-sm font-semibold text-gray-900">
                 Announcements
               </h2>
               <ul className="space-y-2 text-sm text-gray-700">
-                <li className="rounded-md bg-gray-50 p-3">
+                <li className="rounded-md  p-3">
                   System maintenance scheduled for Friday 9 PM.
                 </li>
-                <li className="rounded-md bg-gray-50 p-3">
+                <li className="rounded-md  p-3">
                   New arrivals this week in Fiction and Science.
                 </li>
-                <li className="rounded-md bg-gray-50 p-3">
+                <li className="rounded-md  p-3">
                   Reminder: Update borrower contact details regularly.
                 </li>
               </ul>
