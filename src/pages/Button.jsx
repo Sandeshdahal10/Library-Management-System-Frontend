@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import { FaPlus } from "react-icons/fa";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useAuth } from "../context/AuthContext";
 
-export default function AddBookButton({ onClick }) {
+export default function AddBookButton({ onClick, fetchBooks }) {
+  const { token } = useAuth();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({
+  const [formData, setFormData] = useState({
     title: "",
     isbn: "",
     totalQuantity: "",
@@ -19,13 +23,43 @@ export default function AddBookButton({ onClick }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
+    setFormData((f) => ({ ...f, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Placeholder submit; wire to API later
-    console.log("Submitting book:", form);
+
+    const payload = {
+      title: (formData.title || "").trim(),
+      author: (formData.author || "").trim(),
+      isbn: (formData.isbn || "").trim(),
+      quantity: Number(formData.totalQuantity || 0),
+      availableBooks: Number(formData.totalQuantity || 0),
+    };
+
+    try {
+      if (!token) {
+        toast.error("You must be logged in to add a book.");
+        setOpen(false);
+        return;
+      }
+
+      const response = await axios.post("http://localhost:8000/api/books", payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      console.log("Book saved:", response.data);
+      toast.success("Book added");
+      if (typeof fetchBooks === "function") {
+        fetchBooks();
+      }
+    } catch (error) {
+      console.error("Error adding book:", error);
+      toast.error("Failed to add book");
+    }
+    console.log("Submitting book:", payload);
     setOpen(false);
   };
 
@@ -78,7 +112,7 @@ export default function AddBookButton({ onClick }) {
                   id="title"
                   name="title"
                   type="text"
-                  value={form.title}
+                  value={formData.title}
                   onChange={handleChange}
                   placeholder="e.g. The Pragmatic Programmer"
                   required
@@ -97,7 +131,7 @@ export default function AddBookButton({ onClick }) {
                   id="isbn"
                   name="isbn"
                   type="text"
-                  value={form.isbn}
+                  value={formData.isbn}
                   onChange={handleChange}
                   placeholder="e.g. 978-0135957059"
                   required
@@ -117,7 +151,7 @@ export default function AddBookButton({ onClick }) {
                   name="totalQuantity"
                   type="number"
                   min="0"
-                  value={form.totalQuantity}
+                  value={formData.totalQuantity}
                   onChange={handleChange}
                   placeholder="e.g. 10"
                   required
@@ -136,7 +170,7 @@ export default function AddBookButton({ onClick }) {
                   id="author"
                   name="author"
                   type="text"
-                  value={form.author}
+                  value={formData.author}
                   onChange={handleChange}
                   placeholder="e.g. Andy Hunt, Dave Thomas"
                   required
