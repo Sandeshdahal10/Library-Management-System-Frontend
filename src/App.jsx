@@ -6,6 +6,8 @@ import "react-toastify/dist/ReactToastify.css";
 import Landing from "./pages/Landing";
 import Book from "./pages/Librarian/Book";
 import Borrowers from "./pages/Librarian/Borrowers";
+import ProtectedRoute from "./utils/ProtectedRoute";
+import BorrowerDashboard from "./pages/Borrowers/BorrowerDashboard";
 
 function App() {
   return (
@@ -13,9 +15,38 @@ function App() {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/librarian" element={<Dashboard />} />
-        <Route path="/librarian/books" element={<Book />} />
-        <Route path="/librarian/borrowers" element={<Borrowers />} />
+        <Route
+          path="/librarian"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/librarian/books"
+          element={
+            <ProtectedRoute>
+              <Book />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/librarian/borrowers"
+          element={
+            <ProtectedRoute>
+              <Borrowers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/borrower"
+          element={
+            // 
+              <BorrowerDashboard />
+            
+          }
+        />
       </Routes>
       <ToastContainer
         position="top-right"

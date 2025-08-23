@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import { FaUserPlus } from "react-icons/fa";
+import {useAuth} from "../context/AuthContext";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 export default function AddBorrowerButton({ onClick }) {
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "" });
+  const { token } = useAuth();
+  const [form, setForm] = useState(false)
 
   const handleClick = () => {
     if (onClick) return onClick();
@@ -17,11 +21,27 @@ export default function AddBorrowerButton({ onClick }) {
     setForm((f) => ({ ...f, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting borrower:", form);
-    setOpen(false);
+     try {
+    if(!token) {
+      toast.error("You must be logged in to add a borrower.");
+      setOpen(false);
+      return;
+    }
+    const response = await axios.post("http://localhost:8000/api/borrowers", form, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    console.log("Borrower added:", response.data);
+    toast.success("Borrower added");
+  } catch (error) {
+    console.error("Error adding borrower:", error);
+  }
   };
+ 
 
   return (
     <>

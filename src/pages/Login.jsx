@@ -32,9 +32,27 @@ export default function Login() {
       }
 
       if (token) {
+        // determine role and navigate accordingly
+        const isBorrower = (() => {
+          if (!user) return false;
+          const normalize = (v) => (v ? String(v).toLowerCase().trim() : "");
+          const role = normalize(user.role || user.type || user.userType);
+          if (role === "borrower") return true;
+          if (Array.isArray(user.roles)) {
+            if (user.roles.some(r => normalize(r) === "borrower")) return true;
+          }
+          if (user.isBorrower === true) return true;
+          return false;
+        })();
+
         toast.success("Login successful");
-        navigate("/librarian");
+        // store token (login already saved user/token, but keep localStorage token for compatibility)
         localStorage.setItem("token", token);
+        if (isBorrower) {
+          navigate("/borrower");
+        } else {
+          navigate("/librarian");
+        }
       } else {
         toast.error("Login failed, please try again");
       }

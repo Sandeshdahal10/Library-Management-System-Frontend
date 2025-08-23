@@ -1,6 +1,18 @@
 import { FaBookOpen, FaSearch, FaBell, FaUser } from "react-icons/fa";
 import LogoutButton from "../utils/Logout";
+import { useAuth } from "../context/AuthContext";
+
 export function Header({ onToggleSidebar }) {
+  const { user } = useAuth();
+
+  // simple role check: only treat exact 'borrower' as borrower
+  const isBorrower = !!(
+    user && (
+      (typeof user.role === "string" && user.role.toLowerCase() === "borrower") ||
+      (Array.isArray(user.roles) && user.roles.includes("borrower")) ||
+      user.isBorrower === true
+    )
+  );
   return (
     <header className="sticky top-0 z-50 bg-white shadow">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
@@ -20,7 +32,7 @@ export function Header({ onToggleSidebar }) {
           {/* Brand */}
           <div className="flex items-center gap-2 whitespace-nowrap text-lg font-bold">
             <FaBookOpen className="text-blue-600" />
-            <span>LBMS Admin</span>
+            <span>{isBorrower ? "LBMS Borrower" : "LBMS Librarian"}</span>
           </div>
         </div>
 

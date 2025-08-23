@@ -1,8 +1,20 @@
 import { FaHome, FaBook, FaUsers, FaQuestionCircle } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export function Sidebar() {
   const { pathname } = useLocation();
+  const { user } = useAuth();
+
+  // determine if the logged-in user is a borrower (strict: only 'borrower')
+  const isBorrower = Boolean(
+    user && (
+      user.role === "borrower" ||
+      user.type === "borrower" ||
+      user.userType === "borrower" ||
+      user.isBorrower === true
+    )
+  );
   return (
     <aside className="hidden md:flex sticky top-16 h-[calc(100vh-4rem)] w-64 flex-col border-r bg-white">
       {/* Navigation */}
@@ -63,28 +75,53 @@ export function Sidebar() {
               <span>Books</span>
             </Link>
           </li>
-          <li>
-            <Link
-              to="/librarian/borrowers"
-              aria-current={
-                pathname.startsWith("/librarian/borrowers") ? "page" : undefined
-              }
-              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
-                pathname.startsWith("/librarian/borrowers")
-                  ? "bg-blue-50 text-blue-700"
-                  : "text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              <FaUsers
-                className={
-                  pathname.startsWith("/librarian/borrowers")
-                    ? "text-blue-600"
-                    : "text-gray-400"
+          {isBorrower ? (
+            <li>
+              <Link
+                to="/librarian/history"
+                aria-current={
+                  pathname.startsWith("/librarian/history") ? "page" : undefined
                 }
-              />
-              <span>Borrowers</span>
-            </Link>
-          </li>
+                className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
+                  pathname.startsWith("/librarian/history")
+                    ? "bg-blue-50 text-blue-700"
+                    : "text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                <FaUsers
+                  className={
+                    pathname.startsWith("/librarian/history")
+                      ? "text-blue-600"
+                      : "text-gray-400"
+                  }
+                />
+                <span>History</span>
+              </Link>
+            </li>
+          ) : (
+            <li>
+              <Link
+                to="/librarian/borrowers"
+                aria-current={
+                  pathname.startsWith("/librarian/borrowers") ? "page" : undefined
+                }
+                className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
+                  pathname.startsWith("/librarian/borrowers")
+                    ? "bg-blue-50 text-blue-700"
+                    : "text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                <FaUsers
+                  className={
+                    pathname.startsWith("/librarian/borrowers")
+                      ? "text-blue-600"
+                      : "text-gray-400"
+                  }
+                />
+                <span>Borrowers</span>
+              </Link>
+            </li>
+          )}
         </ul>
 
         {/* Help */}
@@ -109,7 +146,7 @@ export function Sidebar() {
 
       {/* Footer badge */}
       <div className="border-t px-3 py-3 text-[11px] text-gray-500">
-        LBMS Admin · v0.1.0
+        {user ? `LBMS · ${isBorrower ? "Borrower" : "Admin"}` : "LBMS · v0.1.0"}
       </div>
     </aside>
   );
