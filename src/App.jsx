@@ -8,6 +8,8 @@ import Book from "./pages/Librarian/Book";
 import Borrowers from "./pages/Librarian/Borrowers";
 import ProtectedRoute from "./utils/ProtectedRoute";
 import BorrowerDashboard from "./pages/Borrowers/BorrowerDashboard";
+import History from "./pages/Borrowers/History";
+import Books from "./pages/Borrowers/Books";
 
 function App() {
   return (
@@ -42,9 +44,25 @@ function App() {
         <Route
           path="/borrower"
           element={
-            // 
+            <ProtectedRoute>
               <BorrowerDashboard />
-            
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/borrower/history"
+          element={
+            <ProtectedRoute>
+              <History />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/borrower/books"
+          element={
+            <ProtectedRoute>
+              <Books />
+            </ProtectedRoute>
           }
         />
       </Routes>

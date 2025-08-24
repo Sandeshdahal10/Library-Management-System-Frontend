@@ -1,16 +1,77 @@
 import { FaBookOpen, FaSearch, FaBell, FaUser } from "react-icons/fa";
 import LogoutButton from "../utils/Logout";
 import { useAuth } from "../context/AuthContext";
+import axios from 'axios';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export function Header({ onToggleSidebar }) {
-  const { user } = useAuth();
+  const auth = useAuth();
+  const user = auth?.user ?? null;
+  const navigate = useNavigate();
 
-  // simple role check: only treat exact 'borrower' as borrower
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [suggestions, setSuggestions] = React.useState([]);
+  const [loadingSuggestions, setLoadingSuggestions] = React.useState(false);
+  const timerRef = React.useRef(null);
+
+  // fetch suggestions (debounced)
+  React.useEffect(() => {
+    if (!searchTerm || searchTerm.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+    setLoadingSuggestions(true);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(async () => {
+      try {
+        const res = await axios.get('http://localhost:8000/api/books', { params: { q: searchTerm } });
+        const list = Array.isArray(res.data) ? res.data : (Array.isArray(res.data?.books) ? res.data.books : []);
+        setSuggestions(list.slice(0, 10));
+      } catch (err) {
+        console.debug('Suggestion fetch error', err?.toString());
+        setSuggestions([]);
+      } finally {
+        setLoadingSuggestions(false);
+      }
+    }, 300);
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [searchTerm]);
+
+  const selectSuggestion = (s) => {
+    // navigate to books page with single result
+    navigate('/librarian/books', { state: { searchResults: [s] } });
+    setSearchTerm('');
+    setSuggestions([]);
+  };
+
+  const handleSearch = async () => {
+    if (!searchTerm || searchTerm.trim().length === 0) return;
+    try {
+      const res = await axios.get('http://localhost:8000/api/books', { params: { q: searchTerm } });
+      const list = Array.isArray(res.data) ? res.data : (Array.isArray(res.data?.books) ? res.data.books : []);
+      // navigate to books page and pass results in state
+      navigate('/librarian/books', { state: { searchResults: list } });
+      setSearchTerm('');
+      setSuggestions([]);
+    } catch (err) {
+      console.error('Search error', err);
+    }
+  };
+
+  // forgiving role check: treat anything containing 'borrower' as borrower (e.g. 'ROLE_BORROWER')
   const isBorrower = !!(
     user && (
-      (typeof user.role === "string" && user.role.toLowerCase() === "borrower") ||
-      (Array.isArray(user.roles) && user.roles.includes("borrower")) ||
-      user.isBorrower === true
+      (typeof user.role === "string" && user.role.toLowerCase().includes("borrower")) ||
+      (Array.isArray(user.roles) && user.roles.some(r => String(r).toLowerCase().includes("borrower"))) ||
+      user.isBorrower === true ||
+      (() => {
+        try {
+          return JSON.stringify(user).toLowerCase().includes("borrower");
+        } catch (e) {
+          return false;
+        }
+      })()
     )
   );
   return (
@@ -38,20 +99,32 @@ export function Header({ onToggleSidebar }) {
 
         {/* Center: Search  */}
         <div className="hidden w-full max-w-xl md:block">
-          <form className="relative flex items-center" role="search">
+          <form className="relative flex items-center" role="search" onSubmit={(e) => { e.preventDefault(); handleSearch(); }}>
             <FaSearch className="pointer-events-none absolute left-3 text-gray-400" />
             <input
               type="search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleSearch(); } }}
               placeholder="Search books"
               className="h-10 w-full rounded-xl border border-gray-200 pl-10 pr-24 text-sm outline-none transition placeholder:text-gray-400 focus:border-blue-400"
             />
             <button
               type="button"
-              disabled
-              className="absolute right-2 h-8 rounded-lg  px-3 text-xs text-gray-700 pointer-events-none"
+              onClick={handleSearch}
+              className="absolute right-2 h-8 rounded-lg px-3 text-xs text-gray-700"
             >
               Search
             </button>
+
+            {/* suggestions dropdown */}
+            {suggestions.length > 0 && (
+              <ul className="absolute left-0 top-full z-50 mt-1 max-h-64 w-full overflow-auto rounded-md border bg-white p-2 shadow">
+                {suggestions.map((s) => (
+                  <li key={s._id || s.isbn || s.id} className="cursor-pointer px-2 py-1 text-sm hover:bg-gray-100" onClick={() => selectSuggestion(s)}>{s.title}</li>
+                ))}
+              </ul>
+            )}
           </form>
         </div>
 

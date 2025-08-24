@@ -4,17 +4,28 @@ import { useAuth } from "../context/AuthContext";
 
 export function Sidebar() {
   const { pathname } = useLocation();
-  const { user } = useAuth();
+  const auth = useAuth();
+  const user = auth?.user ?? null;
 
-  // determine if the logged-in user is a borrower (strict: only 'borrower')
-  const isBorrower = Boolean(
+  // simple exact check: consider borrower only when role === 'borrower' or roles includes 'borrower'
+  // forgiving check: treat any role value containing 'borrower' as borrower (handles 'ROLE_BORROWER')
+  const isBorrower = !!(
     user && (
-      user.role === "borrower" ||
-      user.type === "borrower" ||
-      user.userType === "borrower" ||
+      (typeof user.role === "string" && user.role.toLowerCase().includes("borrower")) ||
+      (Array.isArray(user.roles) && user.roles.some(r => String(r).toLowerCase().includes("borrower"))) ||
       user.isBorrower === true
     )
   );
+  // extra fallback: check entire serialized user object for 'borrower'
+  const isBorrowerFallback = (() => {
+    try {
+      return user && JSON.stringify(user).toLowerCase().includes("borrower");
+    } catch (e) {
+      return false;
+    }
+  })();
+  // If the app is currently on a borrower route, prefer borrower menu as a safe fallback
+  const finalIsBorrower = isBorrower || isBorrowerFallback || pathname.startsWith("/borrower");
   return (
     <aside className="hidden md:flex sticky top-16 h-[calc(100vh-4rem)] w-64 flex-col border-r bg-white">
       {/* Navigation */}
@@ -30,17 +41,17 @@ export function Sidebar() {
         <ul className="space-y-1">
           <li>
             <Link
-              to="/librarian"
-              aria-current={pathname === "/librarian" ? "page" : undefined}
+              to={finalIsBorrower ? "/borrower" : "/librarian"}
+              aria-current={
+                finalIsBorrower ? (pathname === "/borrower" ? "page" : undefined) : (pathname === "/librarian" ? "page" : undefined)
+              }
               className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
-                pathname === "/librarian"
-                  ? "bg-blue-50 text-blue-700"
-                  : "text-gray-700 hover:bg-gray-50"
+                finalIsBorrower ? (pathname === "/borrower" ? "bg-blue-50 text-blue-700" : "text-gray-700 hover:bg-gray-50") : (pathname === "/librarian" ? "bg-blue-50 text-blue-700" : "text-gray-700 hover:bg-gray-50")
               }`}
             >
               <FaHome
                 className={
-                  pathname === "/librarian" ? "text-blue-600" : "text-gray-400"
+                  finalIsBorrower ? (pathname === "/borrower" ? "text-blue-600" : "text-gray-400") : (pathname === "/librarian" ? "text-blue-600" : "text-gray-400")
                 }
               />
               <span>Dashboard</span>
@@ -55,42 +66,44 @@ export function Sidebar() {
         <ul className="space-y-1">
           <li>
             <Link
-              to="/librarian/books"
+              to={finalIsBorrower ? "/borrower/books" : "/librarian/books"}
               aria-current={
-                pathname.startsWith("/librarian/books") ? "page" : undefined
+                finalIsBorrower
+                  ? (pathname.startsWith("/borrower/books") ? "page" : undefined)
+                  : (pathname.startsWith("/librarian/books") ? "page" : undefined)
               }
               className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
-                pathname.startsWith("/librarian/books")
-                  ? "bg-blue-50 text-blue-700"
-                  : "text-gray-700 hover:bg-gray-50"
+                finalIsBorrower
+                  ? (pathname.startsWith("/borrower/books") ? "bg-blue-50 text-blue-700" : "text-gray-700 hover:bg-gray-50")
+                  : (pathname.startsWith("/librarian/books") ? "bg-blue-50 text-blue-700" : "text-gray-700 hover:bg-gray-50")
               }`}
             >
               <FaBook
                 className={
-                  pathname.startsWith("/librarian/books")
-                    ? "text-blue-600"
-                    : "text-gray-400"
+                  finalIsBorrower
+                    ? (pathname.startsWith("/borrower/books") ? "text-blue-600" : "text-gray-400")
+                    : (pathname.startsWith("/librarian/books") ? "text-blue-600" : "text-gray-400")
                 }
               />
               <span>Books</span>
             </Link>
           </li>
-          {isBorrower ? (
+          {finalIsBorrower ? (
             <li>
               <Link
-                to="/librarian/history"
+                to="/borrower/history"
                 aria-current={
-                  pathname.startsWith("/librarian/history") ? "page" : undefined
+                  pathname.startsWith("/borrower/history") ? "page" : undefined
                 }
                 className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
-                  pathname.startsWith("/librarian/history")
+                  pathname.startsWith("/borrower/history")
                     ? "bg-blue-50 text-blue-700"
                     : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
                 <FaUsers
                   className={
-                    pathname.startsWith("/librarian/history")
+                    pathname.startsWith("/borrower/history")
                       ? "text-blue-600"
                       : "text-gray-400"
                   }
@@ -146,7 +159,7 @@ export function Sidebar() {
 
       {/* Footer badge */}
       <div className="border-t px-3 py-3 text-[11px] text-gray-500">
-        {user ? `LBMS · ${isBorrower ? "Borrower" : "Admin"}` : "LBMS · v0.1.0"}
+  {user ? `LBMS · ${finalIsBorrower ? "Borrower" : "Admin"}` : "LBMS · v0.1.0"}
       </div>
     </aside>
   );

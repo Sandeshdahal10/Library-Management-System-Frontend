@@ -32,16 +32,21 @@ export default function Login() {
       }
 
       if (token) {
-        // determine role and navigate accordingly
+        // forgiving role detection: treat any role containing 'borrower' (e.g. 'ROLE_BORROWER') as borrower
         const isBorrower = (() => {
           if (!user) return false;
           const normalize = (v) => (v ? String(v).toLowerCase().trim() : "");
           const role = normalize(user.role || user.type || user.userType);
-          if (role === "borrower") return true;
+          if (role.includes("borrower")) return true;
           if (Array.isArray(user.roles)) {
-            if (user.roles.some(r => normalize(r) === "borrower")) return true;
+            if (user.roles.some(r => normalize(r).includes("borrower"))) return true;
           }
           if (user.isBorrower === true) return true;
+          try {
+            if (JSON.stringify(user).toLowerCase().includes("borrower")) return true;
+          } catch (e) {
+            // ignore
+          }
           return false;
         })();
 

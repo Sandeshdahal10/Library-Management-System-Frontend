@@ -2,25 +2,72 @@ import Header from "../../Layout/Header";
 import Sidebar from "../../Layout/Sidebar";
 import { useAuth } from "../../context/AuthContext";
 import AddBorrowerButton from "../AddBorrowerButton";
-import {
-  FaPlus,
-  FaUsers,
-  FaBook,
-  FaExclamationTriangle,
-  FaArrowRight,
-} from "react-icons/fa";
+import { FaPlus, FaUsers, FaBook, FaArrowRight } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AddBookButton from "../Button";
+import axios from 'axios';
 
 export function Dashboard() {
   const { user } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [totalBooks, setTotalBooks] = useState(null);
+  const [activeBorrowers, setActiveBorrowers] = useState(null);
+  const [totalBorrows, setTotalBorrows] = useState(null);
+  const [statsLoading, setStatsLoading] = useState(true);
 
   const click = (label) => () => {
     toast.info(`${label} coming soon`, { autoClose: 2000 });
   };
 
+  // load counts from backend
+  useEffect(() => {
+    let mounted = true;
+    const loadStats = async () => {
+      setStatsLoading(true);
+      try {
+        // total books (public)
+        const booksRes = await axios.get('http://localhost:8000/api/books');
+        const booksData = booksRes.data?.books || booksRes.data || [];
+        const booksCount = Array.isArray(booksData) ? booksData.length : 0;
+
+        // borrow records (requires librarian token) — count borrows and active borrowers
+        // try to get token from localStorage for this page
+        const token = localStorage.getItem('token');
+        const hdrs = token ? { Authorization: `Bearer ${token}` } : {};
+        let borrows = [];
+        try {
+          const borRes = await axios.get('http://localhost:8000/api/borrowers', { headers: hdrs });
+          borrows = Array.isArray(borRes.data) ? borRes.data : (Array.isArray(borRes.data?.borrowers) ? borRes.data.borrowers : []);
+        } catch (be) {
+          console.debug('Could not fetch borrows for stats', be?.toString());
+        }
+
+        const totalBorrowsCount = Array.isArray(borrows) ? borrows.length : 0;
+        // active borrowers: unique user ids where returnDate is null/undefined
+        const activeSet = new Set();
+        (borrows || []).forEach(b => {
+          const returned = b.returnDate ?? b.return_date ?? b.returnedAt ?? b.returned_at;
+          if (!returned) {
+            const uid = b.userId ?? b.user_id ?? (b.user && (b.user._id || b.user.id)) ?? null;
+            if (uid) activeSet.add(String(uid));
+          }
+        });
+
+        if (!mounted) return;
+        setTotalBooks(booksCount);
+        setTotalBorrows(totalBorrowsCount);
+        setActiveBorrowers(activeSet.size);
+      } catch (err) {
+        console.error('Error loading dashboard stats', err);
+        toast.error('Failed to load dashboard stats');
+      } finally {
+        if (mounted) setStatsLoading(false);
+      }
+    };
+    loadStats();
+    return () => { mounted = false; };
+  }, []);
   return (
     <div className="min-h-screen bg-gray-50">
       <Header onToggleSidebar={() => setMobileOpen(true)} />
@@ -77,62 +124,33 @@ export function Dashboard() {
           </section>
 
           {/* Stats Cards */}
-          <section className="mb-4 grid gap-3 sm:mb-6 sm:grid-cols-2 lg:grid-cols-4">
-            <button
-              onClick={click("Books")}
-              className="rounded-xl border border-gray-200 bg-white p-4 text-left shadow-sm hover:shadow"
-            >
+          <section className="mb-4 grid gap-3 sm:mb-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="rounded-xl border border-gray-200 bg-white p-4 text-left shadow-sm">
               <div className="flex items-start justify-between">
                 <div className="text-sm text-gray-500">Total Books</div>
                 <FaBook className="text-blue-600" />
               </div>
-              <div className="mt-2 text-2xl font-semibold">1,284</div>
-              <div className="mt-2 inline-flex items-center gap-1 text-xs text-blue-700">
-                View <FaArrowRight />
-              </div>
-            </button>
+              <div className="mt-2 text-2xl font-semibold">{statsLoading ? '—' : (totalBooks ?? 0)}</div>
+              <div className="mt-2 inline-flex items-center gap-1 text-xs text-blue-700">View <FaArrowRight /></div>
+            </div>
 
-            <button
-              onClick={click("Borrowers")}
-              className="rounded-xl border border-gray-200 bg-white p-4 text-left shadow-sm hover:shadow"
-            >
+            <div className="rounded-xl border border-gray-200 bg-white p-4 text-left shadow-sm">
               <div className="flex items-start justify-between">
                 <div className="text-sm text-gray-500">Active Borrowers</div>
                 <FaUsers className="text-indigo-600" />
               </div>
-              <div className="mt-2 text-2xl font-semibold">342</div>
-              <div className="mt-2 inline-flex items-center gap-1 text-xs text-indigo-700">
-                View <FaArrowRight />
-              </div>
-            </button>
+              <div className="mt-2 text-2xl font-semibold">{statsLoading ? '—' : (activeBorrowers ?? 0)}</div>
+              <div className="mt-2 inline-flex items-center gap-1 text-xs text-indigo-700">View <FaArrowRight /></div>
+            </div>
 
-            <button
-              onClick={click("Overdue items")}
-              className="rounded-xl border border-gray-200 bg-white p-4 text-left shadow-sm hover:shadow"
-            >
+            <div className="rounded-xl border border-gray-200 bg-white p-4 text-left shadow-sm">
               <div className="flex items-start justify-between">
-                <div className="text-sm text-gray-500">Overdue Items</div>
-                <FaExclamationTriangle className="text-amber-600" />
+                <div className="text-sm text-gray-500">Total Borrows</div>
+                <FaUsers className="text-gray-600" />
               </div>
-              <div className="mt-2 text-2xl font-semibold">27</div>
-              <div className="mt-2 inline-flex items-center gap-1 text-xs text-amber-700">
-                Review <FaArrowRight />
-              </div>
-            </button>
-
-            <button
-              onClick={click("Reservations queue")}
-              className="rounded-xl border border-gray-200 bg-white p-4 text-left shadow-sm hover:shadow"
-            >
-              <div className="flex items-start justify-between">
-                <div className="text-sm text-gray-500">Reservations Queue</div>
-                <FaBook className="text-green-600" />
-              </div>
-              <div className="mt-2 text-2xl font-semibold">12</div>
-              <div className="mt-2 inline-flex items-center gap-1 text-xs text-green-700">
-                Review <FaArrowRight />
-              </div>
-            </button>
+              <div className="mt-2 text-2xl font-semibold">{statsLoading ? '—' : (totalBorrows ?? 0)}</div>
+              <div className="mt-2 inline-flex items-center gap-1 text-xs text-gray-700">View <FaArrowRight /></div>
+            </div>
           </section>
 
           {/* Announcements */}
