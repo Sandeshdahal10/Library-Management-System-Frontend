@@ -24,7 +24,7 @@ export default function BookTable({ books: initialBooks }) {
       setError(null);
       try {
         // Backend now exposes a public GET /api/books — call without Authorization header.
-        const res = await axios.get('http://localhost:8000/api/books');
+        const res = await axios.get('https://library-management-system-boo3.onrender.com/api/books');
         if (!mounted) return;
         setBooks(res.data || []);
       } catch (err) {
@@ -44,7 +44,7 @@ export default function BookTable({ books: initialBooks }) {
     if (!isbn) return toast.error('Missing ISBN');
     if (!window.confirm('Delete this book?')) return;
     try {
-      await axios.delete(`http://localhost:8000/api/books/${encodeURIComponent(isbn)}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+      await axios.delete(`https://library-management-system-boo3.onrender.com/api/books/${encodeURIComponent(isbn)}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
       setBooks((s) => s.filter(b => (b.isbn || b.ISBN) !== isbn));
       toast.success('Book deleted');
     } catch (err) {
@@ -68,7 +68,7 @@ export default function BookTable({ books: initialBooks }) {
     const quantity = parseInt(quantityStr, 10) || 0;
     const availableBooks = parseInt(availableStr, 10) || 0;
     try {
-      const res = await axios.put(`http://localhost:8000/api/books/${encodeURIComponent(isbn)}`, { title, author, quantity, availableBooks }, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+      const res = await axios.put(`https://library-management-system-boo3.onrender.com/api/books/${encodeURIComponent(isbn)}`, { title, author, quantity, availableBooks }, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
       const updated = res.data?.book || res.data;
       setBooks((s) => s.map(b => ((b.isbn || b.ISBN) === isbn ? updated : b)));
       toast.success('Book updated');
@@ -82,7 +82,7 @@ export default function BookTable({ books: initialBooks }) {
     const bookId = book._id || book.id || book.bookId;
     if (!bookId) return toast.error('Missing book id for borrow');
     try {
-      const res = await axios.post('http://localhost:8000/api/borrow', { bookId }, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+      const res = await axios.post('https://library-management-system-boo3.onrender.com/api/borrow', { bookId }, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
       toast.success(res?.data?.message || 'Borrowed');
       // update available locally
       setBooks((s) => s.map(b => ((b._id === bookId || b.id === bookId) ? { ...b, availableBooks: (b.availableBooks ?? b.available ?? 0) - 1 } : b)));
@@ -99,7 +99,7 @@ export default function BookTable({ books: initialBooks }) {
       const hdrs = token ? { Authorization: `Bearer ${token}` } : {};
 
       // Get borrow history for current user
-      const res = await axios.get('http://localhost:8000/api/borrow/history', { headers: hdrs });
+      const res = await axios.get('https://library-management-system-boo3.onrender.com/api/borrow/history', { headers: hdrs });
       const history = res.data?.borrows || [];
 
       const found = history.find(rec => {
@@ -119,7 +119,7 @@ export default function BookTable({ books: initialBooks }) {
       const borrowId = found._id || found.id;
       if (!borrowId) return toast.error('Borrow record id not found');
 
-      const url = `http://localhost:8000/api/borrow/return/${encodeURIComponent(borrowId)}`;
+      const url = `https://library-management-system-boo3.onrender.com/api/borrow/return/${encodeURIComponent(borrowId)}`;
       const ret = await axios.post(url, {}, { headers: hdrs });
       toast.success(ret?.data?.message || 'Returned');
 

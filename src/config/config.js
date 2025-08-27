@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Base URL for all API requests.
 // Used by the axios instance below to build request URLs.
-export const baseURL = 'http://localhost:8000/api';
+export const baseURL = 'https://library-management-system-boo3.onrender.com/api';
 
 const api = axios.create({
   baseURL: baseURL,

@@ -17,13 +17,13 @@ export default function Book() {
       // try with token first (librarian may have a token), then fall back to public
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       try {
-        const res = await axios.get('http://localhost:8000/api/books', { headers });
+        const res = await axios.get('https://library-management-system-boo3.onrender.com/api/books', { headers });
         setBooks(res.data?.books || res.data || []);
         return;
       } catch (err) {
         // try without auth as fallback
         try {
-          const res2 = await axios.get('http://localhost:8000/api/books');
+          const res2 = await axios.get('https://library-management-system-boo3.onrender.com/api/books');
           setBooks(res2.data?.books || res2.data || []);
           return;
         } catch (err2) {

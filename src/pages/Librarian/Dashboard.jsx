@@ -27,7 +27,7 @@ export function Dashboard() {
       setStatsLoading(true);
       try {
         // total books (public)
-        const booksRes = await axios.get('http://localhost:8000/api/books');
+        const booksRes = await axios.get('https://library-management-system-boo3.onrender.com/api/books');
         const booksData = booksRes.data?.books || booksRes.data || [];
         const booksCount = Array.isArray(booksData) ? booksData.length : 0;
 
@@ -37,7 +37,7 @@ export function Dashboard() {
         const hdrs = token ? { Authorization: `Bearer ${token}` } : {};
         let borrows = [];
         try {
-          const borRes = await axios.get('http://localhost:8000/api/borrowers', { headers: hdrs });
+          const borRes = await axios.get('https://library-management-system-boo3.onrender.com/api/borrowers', { headers: hdrs });
           borrows = Array.isArray(borRes.data) ? borRes.data : (Array.isArray(borRes.data?.borrowers) ? borRes.data.borrowers : []);
         } catch (be) {
           console.debug('Could not fetch borrows for stats', be?.toString());

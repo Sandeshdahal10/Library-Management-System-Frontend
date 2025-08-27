@@ -16,7 +16,7 @@ export default function History() {
       setLoading(true);
       setError(null);
       try {
-        const res = await axios.get("http://localhost:8000/api/borrow/history", {
+        const res = await axios.get("https://library-management-system-boo3.onrender.com/api/borrow/history", {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = res.data;

@@ -29,7 +29,7 @@ export default function AddBorrowerButton({ onClick }) {
       setOpen(false);
       return;
     }
-    const response = await axios.post("http://localhost:8000/api/borrowers", form, {
+    const response = await axios.post("https://library-management-system-boo3.onrender.com/api/borrowers", form, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",

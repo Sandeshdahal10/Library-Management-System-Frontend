@@ -18,7 +18,7 @@ export function BorrowerDashboard() {
       try {
         // Assumption: API endpoint GET /api/loans accepts userId as query param
         const userId = user.id ?? user._id ?? user.userId;
-        const res = await axios.get("http://localhost:8000/api/", {
+        const res = await axios.get("https://library-management-system-boo3.onrender.com/api/", {
           params: { userId },
           headers: { Authorization: `Bearer ${token}` },
         });
