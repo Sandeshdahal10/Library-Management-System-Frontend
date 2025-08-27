@@ -12,6 +12,9 @@ export default function BookTable({ books: initialBooks }) {
   const [books, setBooks] = React.useState(initialBooks ?? []);
   const [loading, setLoading] = React.useState(!Array.isArray(initialBooks) || initialBooks.length === 0);
   const [error, setError] = React.useState(null);
+  const [modelForm, setModelForm] = React.useState(false);
+  const [editingBook, setEditingBook] = React.useState(null);
+  const [editForm, setEditForm] = React.useState({});
 
   React.useEffect(() => {
     let mounted = true;
@@ -53,28 +56,41 @@ export default function BookTable({ books: initialBooks }) {
     }
   };
 
-  const handleEdit = async (isbn) => {
+  // Open edit modal for a book
+  const handleOpenEdit = (book) => {
+    if (!book) return toast.error('Missing book');
+    setEditingBook(book);
+    setEditForm({
+      title: book.title || '',
+      author: book.author || '',
+      quantity: book.quantity ?? book.total ?? 0,
+      availableBooks: book.availableBooks ?? book.available ?? 0,
+    });
+    setModelForm(true);
+  };
+
+  const handleSaveEdit = async (e) => {
+    e?.preventDefault?.();
+    if (!editingBook) return toast.error('Nothing to edit');
+    const isbn = editingBook.isbn || editingBook.ISBN;
     if (!isbn) return toast.error('Missing ISBN');
-    const book = books.find(b => (b.isbn || b.ISBN) === isbn);
-    if (!book) return toast.error('Book not found');
-    const title = window.prompt('Title', book.title || '');
-    if (title === null) return; // cancelled
-    const author = window.prompt('Author', book.author || '');
-    if (author === null) return;
-    const quantityStr = window.prompt('Quantity', String(book.quantity ?? book.total ?? 0));
-    if (quantityStr === null) return;
-    const availableStr = window.prompt('Available Books', String(book.availableBooks ?? book.available ?? 0));
-    if (availableStr === null) return;
-    const quantity = parseInt(quantityStr, 10) || 0;
-    const availableBooks = parseInt(availableStr, 10) || 0;
     try {
-      const res = await axios.put(`https://library-management-system-boo3.onrender.com/api/books/${encodeURIComponent(isbn)}`, { title, author, quantity, availableBooks }, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
-      const updated = res.data?.book || res.data;
+      const payload = {
+        title: editForm.title,
+        author: editForm.author,
+        quantity: Number(editForm.quantity) || 0,
+        availableBooks: Number(editForm.availableBooks) || 0,
+      };
+      const res = await axios.put(`https://library-management-system-boo3.onrender.com/api/books/${encodeURIComponent(isbn)}`, payload, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+      const updated = res.data?.book || res.data || { ...editingBook, ...payload };
       setBooks((s) => s.map(b => ((b.isbn || b.ISBN) === isbn ? updated : b)));
       toast.success('Book updated');
+      setModelForm(false);
+      setEditingBook(null);
     } catch (err) {
       const msg = err?.response?.data?.message || err.message || 'Failed to update';
       toast.error(msg);
+      console.error('Edit save error', err);
     }
   };
 
@@ -168,6 +184,7 @@ export default function BookTable({ books: initialBooks }) {
   if (error) return <div className="text-red-600">{error}</div>;
 
   return (
+    <>
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200 bg-white">
         <thead className="bg-gray-50">
@@ -189,7 +206,7 @@ export default function BookTable({ books: initialBooks }) {
               <td className="px-4 py-3 text-sm text-gray-600 flex items-center gap-3">
                 {isLibrarian && (
                   <>
-                    <button onClick={() => handleEdit(b.isbn)} title="Edit" className="text-blue-600 hover:text-blue-800">Edit</button>
+                    <button onClick={() => handleOpenEdit(b)} title="Edit" className="text-blue-600 hover:text-blue-800">Edit</button>
                     <button onClick={() => handleDelete(b.isbn)} title="Delete" className="text-red-600 hover:text-red-800">Delete</button>
                   </>
                 )}
@@ -205,5 +222,37 @@ export default function BookTable({ books: initialBooks }) {
         </tbody>
       </table>
     </div>
+    {modelForm && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <div className="w-full max-w-lg rounded bg-white p-6 shadow-lg">
+          <h3 className="text-lg font-semibold mb-4">Edit Book</h3>
+          <form onSubmit={handleSaveEdit} className="flex flex-col gap-3">
+            <div>
+              <label className="block text-sm text-gray-700">Title</label>
+              <input value={editForm.title} onChange={(e) => setEditForm((s) => ({ ...s, title: e.target.value }))} className="mt-1 w-full rounded border-gray-300 p-2" />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-700">Author</label>
+              <input value={editForm.author} onChange={(e) => setEditForm((s) => ({ ...s, author: e.target.value }))} className="mt-1 w-full rounded border-gray-300 p-2" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm text-gray-700">Quantity</label>
+                <input type="number" value={editForm.quantity} onChange={(e) => setEditForm((s) => ({ ...s, quantity: e.target.value }))} className="mt-1 w-full rounded border-gray-300 p-2" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-700">Available</label>
+                <input type="number" value={editForm.availableBooks} onChange={(e) => setEditForm((s) => ({ ...s, availableBooks: e.target.value }))} className="mt-1 w-full rounded border-gray-300 p-2" />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-3">
+              <button type="button" onClick={() => { setModelForm(false); setEditingBook(null); }} className="rounded border px-3 py-1">Cancel</button>
+              <button type="submit" className="rounded bg-blue-600 px-3 py-1 text-white">Save</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )}
+    </>
   );
 }

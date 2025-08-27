@@ -28,7 +28,7 @@ export default function Book() {
           return;
         } catch (err2) {
           console.error('Books fetch errors:', { withAuth: err?.toString(), withoutAuth: err2?.toString() });
-          toast.error('Failed to fetch books — check console for details');
+          toast.error('Failed to fetch books');
         }
       }
     } catch (e) {

@@ -74,6 +74,35 @@ export function Header({ onToggleSidebar }) {
       })()
     )
   );
+  const isLibrarian = !!(
+    user && (
+      (typeof user.role === "string" && user.role.toLowerCase().includes("librarian")) ||
+      (Array.isArray(user.roles) && user.roles.some(r => String(r).toLowerCase().includes("librarian"))) ||
+      user.isLibrarian === true ||
+      (() => {
+        try {
+          return JSON.stringify(user).toLowerCase().includes("librarian");
+        } catch (e) {
+          return false;
+        }
+      })()
+    )
+  );
+  const [profileOpen, setProfileOpen] = React.useState(false);
+  const profileRef = React.useRef(null);
+  const profileBtnRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const onDocClick = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target) && profileBtnRef.current && !profileBtnRef.current.contains(e.target)) {
+        setProfileOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onDocClick);
+    return () => document.removeEventListener('mousedown', onDocClick);
+  }, []);
+
+  const email = user?.email || user?.emailAddress || user?.username || '';
   return (
     <header className="sticky top-0 z-50 bg-white shadow">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
@@ -144,19 +173,30 @@ export function Header({ onToggleSidebar }) {
           </div>
 
           {/* User */}
-          <button
-            type="button"
-            aria-haspopup="menu"
-            aria-expanded="false"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-white text-blue-500 shadow-sm hover:bg-gray-50 cursor-pointer"
-            disabled
-            title="Account"
-          >
-            <FaUser />
-            <span className="sr-only">Open user menu</span>
-          </button>
-
-          <LogoutButton />
+          <div className="relative">
+            <button
+              ref={profileBtnRef}
+              type="button"
+              aria-haspopup="menu"
+              aria-expanded={profileOpen}
+              onClick={() => setProfileOpen((s) => !s)}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-white text-blue-500 shadow-sm hover:bg-gray-50 cursor-pointer"
+              title="Account"
+            >
+              <FaUser />
+              <span className="sr-only">Open user menu</span>
+            </button>
+            {profileOpen && (
+              <div ref={profileRef} className="absolute right-0 mt-2 w-56 rounded-md border bg-white p-3 shadow-lg z-50">
+                <div className="mb-2 text-sm text-gray-700">Signed in as</div>
+                <div className="mb-1 break-words text-sm font-medium text-gray-900">{email || 'Unknown'}</div>
+                <div className="mb-3 text-xs text-gray-500">Role: {isLibrarian ? 'Librarian' : (isBorrower ? 'Borrower' : (user?.role || 'Unknown'))}</div>
+                <div className="flex justify-end">
+                  <LogoutButton />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
