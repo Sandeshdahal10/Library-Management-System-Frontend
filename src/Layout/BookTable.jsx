@@ -3,6 +3,19 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 
+/**
+ * BookTable
+ * A reusable table component showing a list of books with actions.
+ * Props:
+ *  - books: optional initial array of book objects. Each book may contain
+ *    fields like _id, id, isbn, title, author, quantity/total, availableBooks/available.
+ *
+ * Behavior:
+ *  - If `books` prop is empty/absent, fetches from the public GET /api/books.
+ *  - Shows different action buttons depending on user role (borrower or librarian).
+ *  - Provides local updates after borrow/return/delete/edit to keep UI responsive.
+ */
+
 export default function BookTable({ books: initialBooks }) {
   const auth = useAuth();
   const token = auth?.token ?? localStorage.getItem('token');
@@ -16,6 +29,10 @@ export default function BookTable({ books: initialBooks }) {
   const [editingBook, setEditingBook] = React.useState(null);
   const [editForm, setEditForm] = React.useState({});
 
+  /**
+   * Load books on mount when no initialBooks prop is supplied.
+   * Uses a mounted flag to avoid state updates after unmount.
+   */
   React.useEffect(() => {
     let mounted = true;
     async function load() {
@@ -43,6 +60,11 @@ export default function BookTable({ books: initialBooks }) {
     return () => { mounted = false; };
   }, [initialBooks]);
 
+  /**
+   * Delete a book by ISBN.
+   * - isbn: string identifier for the book to delete.
+   * Side effects: shows confirmation, calls DELETE API, updates local state and toasts.
+   */
   const handleDelete = async (isbn) => {
     if (!isbn) return toast.error('Missing ISBN');
     if (!window.confirm('Delete this book?')) return;
@@ -56,7 +78,10 @@ export default function BookTable({ books: initialBooks }) {
     }
   };
 
-  // Open edit modal for a book
+  /**
+   * Open the edit modal and seed the edit form for the given book.
+   * - book: book object to edit.
+   */
   const handleOpenEdit = (book) => {
     if (!book) return toast.error('Missing book');
     setEditingBook(book);
@@ -69,6 +94,10 @@ export default function BookTable({ books: initialBooks }) {
     setModelForm(true);
   };
 
+  /**
+   * Save the currently editing book.
+   * Calls PUT /api/books/:isbn and updates local books list on success.
+   */
   const handleSaveEdit = async (e) => {
     e?.preventDefault?.();
     if (!editingBook) return toast.error('Nothing to edit');
@@ -94,6 +123,10 @@ export default function BookTable({ books: initialBooks }) {
     }
   };
 
+  /**
+   * Borrow a book for the current authenticated user.
+   * Calls POST /api/borrow and decrements availableBooks locally on success.
+   */
   const handleBorrow = async (book) => {
     const bookId = book._id || book.id || book.bookId;
     if (!bookId) return toast.error('Missing book id for borrow');
@@ -108,6 +141,11 @@ export default function BookTable({ books: initialBooks }) {
     }
   };
 
+  /**
+   * Return a previously borrowed book for the current user.
+   * - book: book object to return. The function fetches the user's borrow
+   *   history, finds the active borrow record for this book and calls the return endpoint.
+   */
   const handleReturn = async (book) => {
     // Find the borrow record id for this user & book then call POST /api/borrow/return/:borrowId
     try {
@@ -153,7 +191,10 @@ export default function BookTable({ books: initialBooks }) {
     }
   };
 
-  // role detection
+  // role detection helpers 
+  /**
+   * Tries multiple common property names and structures to detect borrower role.
+   */
   const isBorrower = (() => {
     try {
       if (!user) return false;
@@ -167,6 +208,9 @@ export default function BookTable({ books: initialBooks }) {
     }
   })();
 
+  /**
+   * Tries multiple common property names and structures to detect librarian/admin role.
+   */
   const isLibrarian = (() => {
     try {
       if (!user) return false;

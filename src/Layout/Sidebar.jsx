@@ -2,6 +2,12 @@ import { FaHome, FaBook, FaUsers, FaQuestionCircle } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
+/**
+ * Sidebar
+ * Navigation sidebar used across librarian and borrower layouts.
+ * Detects user role (borrower vs librarian) and adapts links accordingly.
+ */
+
 export function Sidebar() {
   const { pathname } = useLocation();
   const auth = useAuth();

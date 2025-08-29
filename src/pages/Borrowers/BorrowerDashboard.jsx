@@ -3,6 +3,11 @@ import Header from "../../Layout/Header";
 import Sidebar from "../../Layout/Sidebar";
 import { useAuth } from "../../context/AuthContext";
 
+/**
+ * Borrower Dashboard
+ * Simple dashboard for borrower users with quick links to browse and history.
+ */
+
 export function BorrowerDashboard() {
   const { user } = useAuth();
 

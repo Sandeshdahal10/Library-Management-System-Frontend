@@ -6,6 +6,11 @@ import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
 import AddBorrowerButton from "../AddBorrowerButton";
 
+/**
+ * Librarian > Borrowers
+ * Page to list and manage borrower records (admin access expected).
+ */
+
 export default function Borrowers() {
   const { token } = useAuth();
   const [borrower, setBorrower] = useState([]);

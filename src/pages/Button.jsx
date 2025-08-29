@@ -4,6 +4,11 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
 
+/**
+ * AddBookButton
+ * Button with modal form to add a new book. Accepts optional `fetchBooks` callback.
+ */
+
 export default function AddBookButton({ onClick, fetchBooks }) {
   const { token } = useAuth();
   const [open, setOpen] = useState(false);

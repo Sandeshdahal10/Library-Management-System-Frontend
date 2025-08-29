@@ -8,6 +8,11 @@ import { useState, useEffect } from "react";
 import AddBookButton from "../Button";
 import axios from 'axios';
 
+/**
+ * Librarian Dashboard
+ * Overview for librarians with quick stats and shortcuts.
+ */
+
 export function Dashboard() {
   const { user } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);

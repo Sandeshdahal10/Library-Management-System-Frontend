@@ -1,6 +1,11 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
+/**
+ * ProtectedRoute
+ * Wrapper component that redirects unauthenticated users to the landing page.
+ */
+
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
 

@@ -1,6 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
+
+/**
+ * Logout button utility
+ * Calls context logout, shows toast and navigates to landing page.
+ */
 export default function LogoutButton() {
     const navigate = useNavigate();
     const { logout } = useAuth();

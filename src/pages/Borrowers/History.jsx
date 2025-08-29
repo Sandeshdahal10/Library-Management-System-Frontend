@@ -4,6 +4,11 @@ import Sidebar from "../../Layout/Sidebar";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
 
+/**
+ * Borrower History
+ * Shows authenticated user's borrow/return history (requires token).
+ */
+
 export default function History() {
   const { token } = useAuth();
   const [history, setHistory] = useState([]);

@@ -7,6 +7,11 @@ import axios from "axios";
 import { useLocation } from 'react-router-dom';
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
+
+/**
+ * Librarian > Book
+ * Page showing book catalog for librarians, with add/edit/delete capabilities.
+ */
 export default function Book() {
   const [books, setBooks] = useState([]);
   const auth = useAuth();

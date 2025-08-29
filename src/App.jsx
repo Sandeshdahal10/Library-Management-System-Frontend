@@ -11,6 +11,11 @@ import BorrowerDashboard from "./pages/Borrowers/BorrowerDashboard";
 import History from "./pages/Borrowers/History";
 import Books from "./pages/Borrowers/Books";
 
+/**
+ * App (root)
+ * Sets up routing for public and protected pages and mounts the toast container.
+ */
+
 function App() {
   return (
     <BrowserRouter>

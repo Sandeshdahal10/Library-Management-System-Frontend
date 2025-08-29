@@ -2,6 +2,11 @@ import React from "react";
 import { Link } from "react-router-dom";
 import logo from "../logo.svg";
 
+/**
+ * Landing page
+ * Public marketing/entry page with CTA links to Login and features overview.
+ */
+
 export default function Landing() {
 	return (
 		<main className="min-h-screen bg-gradient-to-b from-slate-50 to-white text-slate-800">

@@ -4,6 +4,11 @@ import {useAuth} from "../context/AuthContext";
 import { toast } from "react-toastify";
 import axios from "axios";
 
+/**
+ * AddBorrowerButton
+ * Button and modal to add a borrower. Uses authenticated token if available.
+ */
+
 export default function AddBorrowerButton({ onClick }) {
   const [open, setOpen] = useState(false);
   const { token } = useAuth();

@@ -5,6 +5,12 @@ import axios from 'axios';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
+/**
+ * Header
+ * Top navigation bar with brand, search, notifications and user menu.
+ * Provides a debounced search and suggestion dropdown, and shows role-aware label.
+ */
+
 export function Header({ onToggleSidebar }) {
   const auth = useAuth();
   const user = auth?.user ?? null;

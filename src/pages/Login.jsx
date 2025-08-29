@@ -4,6 +4,11 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import React from "react";
 
+/**
+ * Login page
+ * Simple login form that authenticates against backend and redirects based on role.
+ */
+
 export default function Login() {
   const [email, setEmail] = React.useState("");
   const { login } = useAuth();

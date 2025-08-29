@@ -7,6 +7,11 @@ import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
 import { useLocation } from 'react-router-dom';
 
+/**
+ * Borrower > Books
+ * Public book listing page for borrowers; supports searchResults passed via navigation state.
+ */
+
 export default function Books(){
   const [books, setBooks] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
